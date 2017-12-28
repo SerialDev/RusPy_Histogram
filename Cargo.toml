@@ -1,0 +1,6 @@
+[package]
+name = "RusPy_Hist"
+version = "0.1.0"
+authors = ["Carlos <carlos@easyanticheat.net>"]
+
+[dependencies]
