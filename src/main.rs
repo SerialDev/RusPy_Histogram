@@ -47,6 +47,7 @@ mod utils {
     // ------------------------------------------------------------------------- //
     //                             Bin Implementation                            //
     // ------------------------------------------------------------------------- //
+
     pub struct Bin {
         pub value: f64,
         pub count: i64,
@@ -59,14 +60,30 @@ mod utils {
                 count: 0i64,
             };
         }
+
+        /// Test wheter two Bins are equal,
+        /// comparison is done through the mean  
+        pub fn bin_equality(&self, y: &Bin) -> bool {
+            return self.value == y.value;
+        }
+
+        /// Test whether this bin has a lower mean
+        /// than another Bin
+        pub fn lower_than(&self, y: &Bin) -> bool {
+            return self.value < y.value;
+        }
     }
 
+    /// Simple representation of a histogram bin.
+    /// where value and count are the bin's
+    /// stored mean and count.
     impl fmt::Display for Bin {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(f, "Bin(value={}, count={})", self.value, self.count)
         }
     }
 
+    /// Iterate over the mean and count of this bin
     impl Iterator for Bin {
         type Item = Bin;
         fn next(&mut self) -> Option<Self::Item> {
@@ -87,7 +104,13 @@ fn main() {
         value: 1.0,
         count: 0,
     };
+    let c = utils::Bin {
+        value: 4.0,
+        count: 0,
+    };
+
     println!("{}", b);
+    println!("{}", b.bin_equality(&c));
 }
 
 #[cfg(test)]
@@ -98,5 +121,43 @@ mod tests {
         let c = super::utils::argmin(&a);
         assert_eq!(c.0, 1);
         assert_eq!(c.1, 2.0);
+    }
+
+    #[test]
+    fn bin_eq() {
+        let a = super::utils::Bin {
+            value: 1.0,
+            count: 0,
+        };
+        let b = super::utils::Bin {
+            value: 1.0,
+            count: 0,
+        };
+        let c = super::utils::Bin {
+            value: 4.0,
+            count: 0,
+        };
+
+        assert_eq!(a.bin_equality(&b), true);
+        assert_eq!(b.bin_equality(&c), false);
+    }
+
+    #[test]
+    fn bin_lt() {
+        let a = super::utils::Bin {
+            value: 1.0,
+            count: 0,
+        };
+        let b = super::utils::Bin {
+            value: 1.0,
+            count: 0,
+        };
+        let c = super::utils::Bin {
+            value: 4.0,
+            count: 0,
+        };
+
+        assert_eq!(a.lower_than(&b), false);
+        assert_eq!(b.lower_than(&c), true);
     }
 }
