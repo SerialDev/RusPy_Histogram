@@ -2,6 +2,7 @@ mod utils {
     extern crate libc;
     pub use std::f64::consts::E;
     use std::fmt;
+    use std::ops::Add;
     use std::ops::Index;
 
     mod cmath {
@@ -54,6 +55,7 @@ mod utils {
     /// count: The number of points in this bin. It is assumed that there are
     ///        `count` points surrounding `value`, of which `count/2` points are
     ///        to the left and `count/2` points are to the right.
+    #[derive(Copy, Clone)]
     pub struct Bin {
         pub value: f64,
         pub count: i64,
@@ -86,6 +88,24 @@ mod utils {
         }
     }
 
+    /// Merge this bin with another bin and return the result
+    /// This method implements Step 7 from Algorithm 1 in ref:
+    /// Ben-Haim & Tom-Tov's Streaming Parallel Decision Tree Algorithm
+    impl Add for Bin {
+        type Output = Bin;
+        fn add(self, other: Bin) -> Self::Output {
+            // Sum Heights
+            let count: i64 = self.count + other.count;
+            // Weighted average
+            let mut value = self.value * self.count as f64 + other.value + other.count as f64;
+            value /= count as f64;
+            return Bin {
+                value: value,
+                count: count,
+            };
+        }
+    }
+
     /// Simple representation of a histogram bin.
     /// where value and count are the bin's
     /// stored mean and count.
@@ -102,18 +122,6 @@ mod utils {
             unimplemented!("");
         }
     }
-
-    // impl<T> Index<T> for Bin {
-    //     type Output = &T;
-
-    //     fn index<'a>(&self, bin: usize) -> Self::Output {
-    //         // unimplemented!("");
-    //         !match bin {
-    //             0 => &self.value,
-    //             1 => &self.count,
-    //         }
-    //     }
-    // }
 }
 
 fn main() {
