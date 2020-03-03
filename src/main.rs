@@ -13,6 +13,7 @@ mod utils {
     }
 
     /// Returns the next floating-point number after x in the direction of y
+    /// uses an unsafe call to C::Math
     pub fn next_after(x: f64, y: f64) -> f64 {
         println!("");
         unsafe { cmath::nextafter(x, y) }
@@ -58,6 +59,30 @@ mod utils {
             values.push(start as f64 + h as f64 * i as f64);
         }
         return values;
+    }
+
+    pub fn diff(a: Bin, b: Bin, weighted: bool) -> f64 {
+        let mut diff = b.value - a.value;
+        if weighted {
+            diff *= (E + a.count.min(b.count) as f64).ln();
+        }
+
+        return diff;
+    }
+
+    /// Straightforward quadratic solver
+    pub fn roots(a: f64, b: f64, c: f64) -> (f64, f64) {
+        let d = b.powf(2.0) - (4.0 * a * c);
+        if d < 0.0 {
+            panic!("This eq has no real solution!");
+        } else if d == 0.0 {
+            let x = (-b + d.sqrt()) / (2.0 * a);
+            return (x, x);
+        } else {
+            let x1 = (-b + d.sqrt()) / (2.0 * a);
+            let x2 = (-b - d.sqrt()) / (2.0 * a);
+            return (x1, x2);
+        }
     }
 
     // ------------------------------------------------------------------------- //
@@ -155,6 +180,7 @@ fn main() {
         count: 0,
     };
 
+    println!("diff:{}", utils::diff(b, c, true));
     println!("{}", b);
     println!("{}", b.bin_equality(&c));
     println!("{:?}", utils::linspace(0, 10, 10));
