@@ -226,4 +226,13 @@ mod tests {
         assert_eq!(a.greater_than(&b), false);
         assert_eq!(c.greater_than(&b), true);
     }
+
+    #[test]
+    fn linspace_test() {
+        let a = super::utils::linspace(0, 10, 10);
+        assert_eq!(
+            a,
+            vec![0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
+        );
+    }
 }
