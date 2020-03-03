@@ -3,7 +3,6 @@ mod utils {
     pub use std::f64::consts::E;
     use std::fmt;
     use std::ops::Add;
-    use std::ops::Index;
 
     mod cmath {
         use libc::c_double;
@@ -44,6 +43,21 @@ mod utils {
             }
         }
         (min_index, min)
+    }
+
+    /// Custom version of np's linspace
+    /// returns evenly spaced numbers over a specified interval
+    /// returns num evenly spaced samples calculated over the interval [start, stop]
+    pub fn linspace(start: i64, stop: i64, num: i64) -> std::vec::Vec<f64> {
+        if num == 1 {
+            return vec![stop as f64];
+        }
+        let h = (stop as f64 - start as f64) / num as f64;
+        let mut values = vec![];
+        for i in 0..(num + 1) {
+            values.push(start as f64 + h as f64 * i as f64);
+        }
+        return values;
     }
 
     // ------------------------------------------------------------------------- //
@@ -143,6 +157,7 @@ fn main() {
 
     println!("{}", b);
     println!("{}", b.bin_equality(&c));
+    println!("{:?}", utils::linspace(0, 10, 10));
 }
 
 #[cfg(test)]
