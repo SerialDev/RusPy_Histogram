@@ -1,5 +1,6 @@
 mod utils {
     extern crate libc;
+    use itertools::izip;
     pub use std::f64::consts::E;
     use std::fmt;
     use std::ops::Add;
@@ -69,6 +70,25 @@ mod utils {
         return diff;
     }
 
+    /// PERF: Make some modifications so that no floating point comparisons are done
+    pub fn bin_sums(data: Vec<Bin>, less: Option<i64>) -> Vec<f64> {
+        let mut result = vec![];
+        for a in data.windows(2) {
+            match less {
+                Some(x) if a[1].value <= x as f64 => {
+                    println!("-- {:?}{:?} --1\n", result, a);
+                    result.push((a[0].count + a[1].count) as f64 / 2.0)
+                }
+                None => {
+                    println!("-- {:?}{:?} --2\n", result, a);
+                    result.push((a[0].count + a[1].count) as f64 / 2.0)
+                }
+                _ => (),
+            }
+        }
+        return result;
+    }
+
     /// Straightforward quadratic solver
     pub fn roots(a: f64, b: f64, c: f64) -> (f64, f64) {
         let d = b.powf(2.0) - (4.0 * a * c);
@@ -93,7 +113,7 @@ mod utils {
     /// count: The number of points in this bin. It is assumed that there are
     ///        `count` points surrounding `value`, of which `count/2` points are
     ///        to the left and `count/2` points are to the right.
-    #[derive(Copy, Clone)]
+    #[derive(Debug, Copy, Clone)]
     pub struct Bin {
         pub value: f64,
         pub count: i64,
@@ -172,17 +192,21 @@ fn main() {
     println!("{}", utils::argmin(&a).0);
     let b = utils::Bin {
         value: 1.0,
-        count: 0,
+        count: 10,
     };
     let c = utils::Bin {
         value: 4.0,
-        count: 0,
+        count: 20,
     };
 
     println!("diff:{}", utils::diff(b, c, true));
     println!("{}", b);
     println!("{}", b.bin_equality(&c));
     println!("{:?}", utils::linspace(0, 10, 10));
+    println!(
+        "Bin_sums: {:?}",
+        utils::bin_sums(vec!(b, c, b, b, c), None::<i64>)
+    )
 }
 
 #[cfg(test)]
