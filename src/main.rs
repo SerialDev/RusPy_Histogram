@@ -319,4 +319,21 @@ mod tests {
         assert_eq! {result_lt, vec![15.0, 15.0, 10.0, 15.0]}
         assert_eq! {result_gt, vec![]}
     }
+
+    #[test]
+    fn bin_diff_test() {
+        let b = super::utils::Bin {
+            value: 1.0,
+            count: 10,
+        };
+        let c = super::utils::Bin {
+            value: 4.0,
+            count: 20,
+        };
+
+        let result_true = super::utils::bin_diff(vec![b, c, b, b, c], true);
+        let result_false = super::utils::bin_diff(vec![b, c, b, b, c], false);
+        assert_eq! {result_true, vec![7.629121417228003, -7.629121417228003, 0.0, 7.629121417228003]}
+        assert_eq! {result_false, vec![3.0, -3.0, 0.0, 3.0]}
+    }
 }
