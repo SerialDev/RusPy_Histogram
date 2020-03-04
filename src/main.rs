@@ -300,4 +300,23 @@ mod tests {
             vec![0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
         );
     }
+
+    #[test]
+    fn bin_sums_test() {
+        let b = super::utils::Bin {
+            value: 1.0,
+            count: 10,
+        };
+        let c = super::utils::Bin {
+            value: 4.0,
+            count: 20,
+        };
+
+        let result_none = super::utils::bin_sums(vec![b, c, b, b, c], None::<i64>);
+        let result_lt = super::utils::bin_sums(vec![b, c, b, b, c], Some(100));
+        let result_gt = super::utils::bin_sums(vec![b, c, b, b, c], Some(0));
+        assert_eq! {result_none, vec![15.0, 15.0, 10.0, 15.0]}
+        assert_eq! {result_lt, vec![15.0, 15.0, 10.0, 15.0]}
+        assert_eq! {result_gt, vec![]}
+    }
 }
