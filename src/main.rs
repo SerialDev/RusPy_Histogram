@@ -66,7 +66,6 @@ mod utils {
         if weighted {
             diff *= (E + a.count.min(b.count) as f64).ln();
         }
-
         return diff;
     }
 
