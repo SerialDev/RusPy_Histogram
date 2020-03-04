@@ -70,6 +70,14 @@ mod utils {
         return diff;
     }
 
+    pub fn bin_diff(data: Vec<Bin>, weighted: bool) -> Vec<f64> {
+        let mut result = vec![];
+        for window in data.windows(2) {
+            result.push(diff(window[0], window[1], weighted));
+        }
+        return result;
+    }
+
     /// PERF: Make some modifications so that no floating point comparisons are done
     pub fn bin_sums(data: Vec<Bin>, less: Option<i64>) -> Vec<f64> {
         let mut result = vec![];
@@ -206,7 +214,15 @@ fn main() {
     println!(
         "Bin_sums: {:?}",
         utils::bin_sums(vec!(b, c, b, b, c), None::<i64>)
-    )
+    );
+    println!(
+        "Bin_diff: {:?}",
+        utils::bin_diff(vec!(b, c, b, b, c), false)
+    );
+    println!(
+        "Bin_diff t: {:?}",
+        utils::bin_diff(vec!(b, c, b, b, c), true)
+    );
 }
 
 #[cfg(test)]
