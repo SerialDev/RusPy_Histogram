@@ -127,6 +127,22 @@ mod utils {
         return result_root;
     }
 
+    pub fn compute_quantile(x: f64, bin_i: Bin, bin_il: Bin, prev_sum: f64) -> f64 {
+        let d = x - prev_sum;
+        let a = bin_il.count - bin_i.count;
+        if a == 0 {
+            let offset = d / (bin_i.count + bin_il.count) as f64 / 2.0;
+            let u = bin_i.value + (offset * (bin_il.value - bin_i.value));
+            return u;
+        } else {
+            let b = 2.0 * bin_i.count as f64;
+            let c = -2.0 * d;
+            let z = find_z(a as f64, b, c);
+            let u = bin_i.value + (bin_il.value - bin_i.value) * z;
+            return u;
+        }
+    }
+
     /// Compute sum between two bins -- WIP details
     pub fn compute_sum(x: f64, bin_i: Bin, bin_il: Bin, prev_sum: f64) -> f64 {
         let b_diff = x - bin_i.value;
@@ -231,6 +247,11 @@ fn main() {
         count: 20,
     };
     println!("{:?}", utils::find_z(-1.5, -1.0, 1.0));
+    println!("compute_sum: {:?}", utils::compute_sum(1.5, b, c, 0.0));
+    println!(
+        "compute_quantile: {:?}",
+        utils::compute_quantile(3.0, b, c, 0.0)
+    );
 }
 
 #[cfg(test)]
