@@ -153,7 +153,7 @@ mod utils {
         let bp_ratio = b_diff / p_diff;
 
         let inner = (bin_il.count - bin_i.count) as f64 * bp_ratio;
-        let result = (bin_i.count as f64 + inner) * (1.0 / (bin_il.value - bin_i.value));
+        let result = (bin_i.count as f64 + inner) * (1.0 / p_diff);
         return result;
     }
 
@@ -171,6 +171,23 @@ mod utils {
 
         return ss;
     }
+
+    // ------------------------------------------------------------------------- //
+    //                     Streaming Histogram implementation                    //
+    // ------------------------------------------------------------------------- //
+    #[derive()]
+    pub struct StreamHist {
+        pub maxbins: i64,
+        pub bins: Vec<f64>,
+        pub total: i64,
+        pub weighted: bool,
+        pub min: f64,
+        pub max: f64,
+        pub freeze: bool,
+        pub missing_count: i64,
+    }
+
+    impl StreamHist {}
 
     // ------------------------------------------------------------------------- //
     //                             Bin Implementation                            //
