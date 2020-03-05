@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 mod utils {
     extern crate libc;
     use itertools::izip;
@@ -98,18 +99,32 @@ mod utils {
     }
 
     /// Straightforward quadratic solver
-    pub fn roots(a: f64, b: f64, c: f64) -> (f64, f64) {
+    pub fn roots(a: f64, b: f64, c: f64) -> [f64; 2] {
         let d = b.powf(2.0) - (4.0 * a * c);
         if d < 0.0 {
             panic!("This eq has no real solution!");
         } else if d == 0.0 {
             let x = (-b + d.sqrt()) / (2.0 * a);
-            return (x, x);
+            return [x, x];
         } else {
             let x1 = (-b + d.sqrt()) / (2.0 * a);
             let x2 = (-b - d.sqrt()) / (2.0 * a);
-            return (x1, x2);
+            return [x1, x2];
         }
+    }
+
+    pub fn find_z(a: f64, b: f64, c: f64) -> f64 {
+        let candidate_roots = roots(a, b, c);
+        let mut result_root: f64 = 0.0;
+        for candidate_root in candidate_roots.iter() {
+            println!("candidate_root:{:?}", candidate_root);
+            if *candidate_root >= 0.0 && *candidate_root <= 1.0 {
+                println!("candidate_root:{:?}", candidate_root);
+                result_root = *candidate_root;
+                break;
+            }
+        }
+        return result_root;
     }
 
     // ------------------------------------------------------------------------- //
@@ -191,13 +206,7 @@ mod utils {
 }
 
 fn main() {
-    println!("Hello, world!");
-    println!("{}", utils::next_after(1.1, 0.1));
-    println!("{}", utils::E);
-
     let a = vec![5.0, 2.0, 3.0, 4.0];
-    println!("{:?}", utils::argmin(&a));
-    println!("{}", utils::argmin(&a).0);
     let b = utils::Bin {
         value: 1.0,
         count: 10,
@@ -206,23 +215,7 @@ fn main() {
         value: 4.0,
         count: 20,
     };
-
-    println!("diff:{}", utils::diff(b, c, true));
-    println!("{}", b);
-    println!("{}", b.bin_equality(&c));
-    println!("{:?}", utils::linspace(0, 10, 10));
-    println!(
-        "Bin_sums: {:?}",
-        utils::bin_sums(vec!(b, c, b, b, c), None::<i64>)
-    );
-    println!(
-        "Bin_diff: {:?}",
-        utils::bin_diff(vec!(b, c, b, b, c), false)
-    );
-    println!(
-        "Bin_diff t: {:?}",
-        utils::bin_diff(vec!(b, c, b, b, c), true)
-    );
+    println!("{:?}", utils::find_z(-1.5, -1.0, 1.0));
 }
 
 #[cfg(test)]
