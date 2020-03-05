@@ -178,16 +178,49 @@ mod utils {
     #[derive()]
     pub struct StreamHist {
         pub maxbins: i64,
-        pub bins: Vec<f64>,
+        pub bins: Vec<Bin>,
         pub total: i64,
         pub weighted: bool,
         pub min: f64,
         pub max: f64,
-        pub freeze: bool,
+        pub freeze: i64,
         pub missing_count: i64,
     }
 
-    impl StreamHist {}
+    impl StreamHist {
+        pub fn update(self, n: f64, count: i64) {
+            unimplemented!("requires fn() insert");
+        }
+
+        pub fn insert(mut self, n: f64, count: i64) {
+            self.update_total(count);
+            if self.min > n {
+                self.min = n;
+            }
+            if self.max < n {
+                self.max = n;
+            }
+            let b = Bin {
+                value: n,
+                count: count,
+            };
+            // Might be worth revisiting this later
+            if self.bins.iter().any(|&i| i.value == b.value) {
+                let index = self.bins.iter().position(|&r| r.value == b.value).unwrap();
+                self.bins[index].count += count;
+            } else {
+                if self.freeze > 0 && self.total >= self.freeze {
+                    // let index = self.bins.bisect(Bin { n, count }); // Look into sortedvec
+                }
+            }
+
+            unimplemented!("WIP");
+        }
+
+        pub fn update_total(&mut self, size: i64) {
+            self.total += size;
+        }
+    }
 
     // ------------------------------------------------------------------------- //
     //                             Bin Implementation                            //
