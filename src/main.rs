@@ -127,6 +127,21 @@ mod utils {
         return result_root;
     }
 
+    /// Compute sum between two bins -- WIP details
+    pub fn compute_sum(x: f64, bin_i: Bin, bin_il: Bin, prev_sum: f64) -> f64 {
+        let b_diff = x - bin_i.value;
+        let p_diff = bin_il.value - bin_i.value;
+        let bp_ratio = b_diff / p_diff;
+
+        let ilTerm = 0.5 * bp_ratio.powf(2.0);
+        let iTerm = bp_ratio - ilTerm;
+
+        let first = prev_sum + bin_i.count as f64 * iTerm;
+        let ss = first + bin_il.count as f64 * ilTerm;
+
+        return ss;
+    }
+
     // ------------------------------------------------------------------------- //
     //                             Bin Implementation                            //
     // ------------------------------------------------------------------------- //
