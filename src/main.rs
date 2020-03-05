@@ -143,7 +143,21 @@ mod utils {
         }
     }
 
-    /// Compute sum between two bins -- WIP details
+    ///Finding the density starting from the sum.
+    /// s = p + (1/2 + r - r^2/2)*i + r^2/2*i1
+    /// r = (x - m) / (m1 - m)
+    /// s_dx = i - (i1 - i) * (x - m) / (m1 - m)
+    pub fn compute_density(p: f64, bin_i: Bin, bin_il: Bin) -> f64 {
+        let b_diff = p - bin_i.value;
+        let p_diff = bin_il.value - bin_i.value;
+        let bp_ratio = b_diff / p_diff;
+
+        let inner = (bin_il.count - bin_i.count) as f64 * bp_ratio;
+        let result = (bin_i.count as f64 + inner) * (1.0 / (bin_il.value - bin_i.value));
+        return result;
+    }
+
+    /// Compute sum -- WIP details
     pub fn compute_sum(x: f64, bin_i: Bin, bin_il: Bin, prev_sum: f64) -> f64 {
         let b_diff = x - bin_i.value;
         let p_diff = bin_il.value - bin_i.value;
