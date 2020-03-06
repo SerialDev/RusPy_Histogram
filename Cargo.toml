@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 libc = ""
 itertools = "0.8.2"
+sorted-vec = "0.3.6"

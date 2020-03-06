@@ -2,6 +2,8 @@
 mod utils {
     extern crate libc;
     use itertools::izip;
+    extern crate sorted_vec;
+    use sorted_vec::SortedVec;
     pub use std::f64::consts::E;
     use std::fmt;
     use std::ops::Add;
@@ -204,7 +206,7 @@ mod utils {
                 value: n,
                 count: count,
             };
-            // Might be worth revisiting this later
+            // Might be worth revisiting this later use bisect_left
             if self.bins.iter().any(|&i| i.value == b.value) {
                 let index = self.bins.iter().position(|&r| r.value == b.value).unwrap();
                 self.bins[index].count += count;
@@ -231,6 +233,7 @@ mod utils {
     /// count: The number of points in this bin. It is assumed that there are
     ///        `count` points surrounding `value`, of which `count/2` points are
     ///        to the left and `count/2` points are to the right.
+    // #[derive(Debug, Copy, Clone, Eq)]
     #[derive(Debug, Copy, Clone)]
     pub struct Bin {
         pub value: f64,
@@ -298,6 +301,20 @@ mod utils {
             unimplemented!("");
         }
     }
+
+    pub trait Bisect<T: Ord> {
+        fn bisect_left(&self, x: &T) -> usize;
+    }
+
+    impl<T: Ord> Bisect<T> for SortedVec<T> {
+        fn bisect_left(&self, x: &T) -> usize {
+            let result = self.binary_search(x);
+            match result {
+                Ok(x) => result.unwrap(),
+                Err(x) => 0 as usize,
+            }
+        }
+    }
 }
 
 fn main() {
@@ -316,6 +333,12 @@ fn main() {
         "compute_quantile: {:?}",
         utils::compute_quantile(3.0, b, c, 0.0)
     );
+    let mut v: sorted_vec::SortedVec<i64> = sorted_vec::SortedVec::new();
+    v.insert(0);
+    v.insert(2);
+    v.insert(3);
+    v.insert(5);
+    // println!("{:?}", v.bisect_left(3));
 }
 
 #[cfg(test)]
