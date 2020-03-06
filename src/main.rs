@@ -1,7 +1,7 @@
 #[allow(dead_code)]
 mod utils {
     extern crate libc;
-    use itertools::izip;
+    use std::cmp::Ordering;
     extern crate sorted_vec;
     use sorted_vec::SortedVec;
     pub use std::f64::consts::E;
@@ -177,10 +177,10 @@ mod utils {
     // ------------------------------------------------------------------------- //
     //                     Streaming Histogram implementation                    //
     // ------------------------------------------------------------------------- //
-    #[derive()]
+    #[derive(Debug)]
     pub struct StreamHist {
         pub maxbins: i64,
-        pub bins: Vec<Bin>,
+        pub bins: SortedVec<Bin>,
         pub total: i64,
         pub weighted: bool,
         pub min: f64,
@@ -194,7 +194,7 @@ mod utils {
             unimplemented!("requires fn() insert");
         }
 
-        pub fn insert(mut self, n: f64, count: i64) {
+        pub fn insert(&mut self, n: f64, count: i64) {
             self.update_total(count);
             if self.min > n {
                 self.min = n;
@@ -206,10 +206,14 @@ mod utils {
                 value: n,
                 count: count,
             };
+
             // Might be worth revisiting this later use bisect_left
             if self.bins.iter().any(|&i| i.value == b.value) {
                 let index = self.bins.iter().position(|&r| r.value == b.value).unwrap();
-                self.bins[index].count += count;
+                {
+                    println!("{:?}", index);
+                    // self.bins[index].count += count;
+                }
             } else {
                 if self.freeze > 0 && self.total >= self.freeze {
                     // let index = self.bins.bisect(Bin { n, count }); // Look into sortedvec
@@ -233,8 +237,7 @@ mod utils {
     /// count: The number of points in this bin. It is assumed that there are
     ///        `count` points surrounding `value`, of which `count/2` points are
     ///        to the left and `count/2` points are to the right.
-    // #[derive(Debug, Copy, Clone, Eq)]
-    #[derive(Debug, Copy, Clone)]
+    #[derive(Debug, Copy, Clone, PartialEq)]
     pub struct Bin {
         pub value: f64,
         pub count: i64,
@@ -285,6 +288,29 @@ mod utils {
         }
     }
 
+    /// This needs fixing ASAP TODO!
+    impl Ord for Bin {
+        fn cmp(&self, other: &Self) -> Ordering {
+            let x = self.value as i64;
+            let z = self.value as i64;
+            x.cmp(&z)
+        }
+    }
+
+    impl PartialOrd for Bin {
+        fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+            Some(self.cmp(other))
+        }
+    }
+
+    // impl PartialEq for Bin {
+    //     fn eq(&self, other: &Self) -> bool {
+    //         self.value == other.value;
+    //     }
+    // }
+
+    impl Eq for Bin {}
+
     /// Simple representation of a histogram bin.
     /// where value and count are the bin's
     /// stored mean and count.
@@ -306,6 +332,10 @@ mod utils {
         fn bisect_left(&self, x: &T) -> usize;
     }
 
+    pub trait BisectInt {
+        fn bisect_left(&self, x: i64) -> usize;
+    }
+
     impl<T: Ord> Bisect<T> for SortedVec<T> {
         fn bisect_left(&self, x: &T) -> usize {
             let result = self.binary_search(x);
@@ -315,7 +345,19 @@ mod utils {
             }
         }
     }
+
+    impl BisectInt for SortedVec<i64> {
+        fn bisect_left(&self, x: i64) -> usize {
+            let result = self.binary_search(&x);
+            match result {
+                Ok(x) => result.unwrap(),
+                Err(x) => 0 as usize,
+            }
+        }
+    }
 }
+
+use crate::utils::Bisect;
 
 fn main() {
     let a = vec![5.0, 2.0, 3.0, 4.0];
@@ -338,7 +380,24 @@ fn main() {
     v.insert(2);
     v.insert(3);
     v.insert(5);
-    // println!("{:?}", v.bisect_left(3));
+    v.bisect_left(&3);
+    println!("{:?}", v);
+    println!("{:?}", v.bisect_left(&3));
+
+    let mut ve: sorted_vec::SortedVec<utils::Bin> = sorted_vec::SortedVec::new();
+    let mut d = utils::StreamHist {
+        maxbins: 5,
+        bins: ve,
+        total: 10,
+        weighted: true,
+        min: 0.0,
+        max: 100.0,
+        freeze: 10,
+        missing_count: 10,
+    };
+    println!("{:?}", d);
+    // d.insert(1.0, 1);
+    d.update_total(1);
 }
 
 #[cfg(test)]
